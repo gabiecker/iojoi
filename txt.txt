@@ -1,0 +1,61 @@
+import speech_recognition as sr
+import pygame
+import RPI.GPIO as gpio
+import time 
+def botao(vezes):
+    for x in range(vezes):
+        GPIO.output(22, GPIO.1)
+        time.sleep(0.1)
+        GPIO.output(22, GPIO.0)
+    pygame.mixer.music.load('start.mp3')
+    pygame.mixer.music.play()
+    print("deu buia")
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(17, GPIO.OUT)
+GPIO.setup(27, GPIO.OUT)
+GPIO.setup(22, GPIO.OUT)
+pygame.init()
+r = sr.Recognizer()
+while True:
+    with sr.Microphone() as source:
+        print("comeco")
+        audio = r.listen(source)
+        try:
+            text = r.recognize_google(audio)
+            print(text)
+            if "start" in text.lower():
+                pygame.mixer.music.load('time.mp3')
+                pygame.mixer.music.play()
+                print("Quanto tempo você quer?")
+                while True:
+                     with sr.Microphone() as source:
+                        print("comeco")
+                        audio = r.listen(source)
+                        text2 = r.recognize_google(audio)
+                        print(text2)
+                        if "30" in text2.lower():
+                           botao(1)
+                           break
+                        if "1 minute" in text2.lower():
+                            botao(2)
+                            break
+                        if "2 minutes" in text2.lower():
+                            botao(4)
+                            break
+                        if "popcorn" in text2.lower():
+                            botao(8)
+            elif "stop" in text.lower():
+                 GPIO.output(27, GPIO.1)
+                 time.sleep(0.1)
+                 GPIO.output(27, GPIO.0)
+                 pygame.mixer.music.load('stop.mp3')
+                 pygame.mixer.music.play()
+                 print("Comando 'stop' reconhecido!")
+            elif "potency" in text.lower():
+                print("Potência alterada")
+                GPIO.output(17, GPIO.1)
+                time.sleep(0.1)
+                GPIO.output(17, GPIO.0)
+        except: 
+            print('comando não reconhecido')
+        
